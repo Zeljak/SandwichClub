@@ -24,38 +24,46 @@ public class JsonUtils {
 
     public static Sandwich parseSandwichJson(String json) throws JSONException {
 
-        JSONObject sandwichJsonObject;
+
         String mainName = null;
-        List<String> alsoKnownAs = new ArrayList<>();
+        List<String> alsoKnownAs = null;
         String placeOfOrigin = null;
         String description = null;
         String image = null;
-        List<String> ingredients = new ArrayList<>();
+        List<String> ingredients = null;
 
         try {
-            //all sandwich data
-            sandwichJsonObject = new JSONObject(json);
+            JSONObject sandwichesJSON = new JSONObject(json);
 
             //sandwich name
-            JSONObject sandwichName = sandwichJsonObject.getJSONObject(SANDWICH_NAME);
+            JSONObject sandwichName = sandwichesJSON.optJSONObject(SANDWICH_NAME);
 
             //sandwich main name
-            mainName = sandwichName.getString(SANDWICH_MAIN_NAME);
+            mainName = sandwichName.optString(SANDWICH_MAIN_NAME);
 
-            //sandwich also known as
-            alsoKnownAs = jsonArrayList(sandwichJsonObject.getJSONArray(SANDWICH_ALSO_KNOWN));
+            //nickname of sandwich
+            JSONArray alsoKnownAsArray = sandwichName.optJSONArray(SANDWICH_ALSO_KNOWN);
+            alsoKnownAs = new ArrayList<>();
+            for (int i = 0; i < alsoKnownAsArray.length(); i++) {
+                alsoKnownAs.add(i, alsoKnownAsArray.optString(i));
+            }
+
 
             //place of origin of sandwich
-            placeOfOrigin = sandwichJsonObject.getString(SANDWICH_PLACE_ORIGIN);
+            placeOfOrigin = sandwichesJSON.optString(SANDWICH_PLACE_ORIGIN);
 
             //description of sandwich
-            description = sandwichJsonObject.getString(SANDWICH_DESCRIPTION);
+            description = sandwichesJSON.optString(SANDWICH_DESCRIPTION);
 
-            //image of sandwich
-            image = sandwichJsonObject.getString(SANDWICH_IMAGE);
 
             //ingredients of sandwich
-            ingredients = jsonArrayList(sandwichJsonObject.getJSONArray(SANDWICH_INGREDIENTS));
+            JSONArray ingredientsArray = sandwichesJSON.optJSONArray(SANDWICH_INGREDIENTS);
+            ingredients = new ArrayList<>();
+            for (int i = 0; i < ingredientsArray.length(); i++) {
+                ingredients.add(i, ingredientsArray.optString(i));
+            }
+            //image of sandwich
+            image = sandwichesJSON.optString(SANDWICH_IMAGE);
 
             //is there an error?
         } catch (JSONException e) {
@@ -64,17 +72,5 @@ public class JsonUtils {
         return new Sandwich(mainName, alsoKnownAs, placeOfOrigin, description, image, ingredients);
     }
 
-    private static List<String> jsonArrayList(JSONArray jsonArray) {
-        List<String> list = new ArrayList<>(0);
-        if (jsonArray != null) {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                try {
-                    list.add(jsonArray.getString(i));
-                } catch (JSONException e) {
-                    Log.e(LOG_TAG, "Error on array list", e);
-                }
-            }
-        }
-        return list;
-    }
+
 }

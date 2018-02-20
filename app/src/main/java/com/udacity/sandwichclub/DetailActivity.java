@@ -18,22 +18,27 @@ public class DetailActivity extends AppCompatActivity {
     public static final String EXTRA_POSITION = "extra_position";
     private static final int DEFAULT_POSITION = -1;
 
+    ImageView ingredientsIv;
+
+    private TextView name;
+    private TextView alsoKnown;
+    private TextView origin;
+    private TextView ingredients;
+    private TextView description;
+
     private Sandwich sandwich;
-    private TextView tv_also_know;
-    private TextView tv_origin;
-    private TextView tv_description;
-    private TextView tv_ingredients;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        ImageView ingredientsIv = findViewById(R.id.image_iv);
-        tv_also_know = findViewById(R.id.also_known_tv);
-        tv_origin =findViewById(R.id.origin_tv);
-        tv_description = findViewById(R.id.description_tv);
-        tv_ingredients = findViewById(R.id.ingredients_tv);
+        ingredientsIv = findViewById(R.id.image_iv);
+        name = findViewById(R.id.name);
+        alsoKnown = findViewById(R.id.also_known_tv);
+        origin = findViewById(R.id.origin_tv);
+        ingredients = findViewById(R.id.ingredients_tv);
+        description = findViewById(R.id.description_tv);
 
 
         Intent intent = getIntent();
@@ -50,7 +55,7 @@ public class DetailActivity extends AppCompatActivity {
 
         String[] sandwiches = getResources().getStringArray(R.array.sandwich_details);
         String json = sandwiches[position];
-        Sandwich sandwich = null;
+
         try {
             sandwich = JsonUtils.parseSandwichJson(json);
         } catch (JSONException e) {
@@ -63,11 +68,6 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         populateUI();
-        Picasso.with(this)
-                .load(sandwich.getImage())
-                .into(ingredientsIv);
-
-        setTitle(sandwich.getMainName());
     }
 
     private void closeOnError() {
@@ -76,27 +76,30 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void populateUI() {
-        if (sandwich.getPlaceOfOrigin().isEmpty()){
-            tv_origin.setText(R.string.detail_error_message);
-        } else {
-            tv_origin.setText(sandwich.getPlaceOfOrigin());
+        Picasso.with(this)
+                .load(sandwich.getImage())
+                .into(ingredientsIv);
+
+        setTitle(sandwich.getMainName());
+
+        name.setText(sandwich.getMainName());
+
+        alsoKnown.setText("");
+        for (int i = 0; i < sandwich.getAlsoKnownAs().size(); i++) {
+            alsoKnown.append("* " + sandwich.getAlsoKnownAs().get(i));
+            alsoKnown.append("\n");
         }
-        if(sandwich.getAlsoKnownAs().isEmpty()){
-            tv_also_know.setText(R.string.detail_error_message);
-        } else {
-            tv_also_know.setText((CharSequence) sandwich.getAlsoKnownAs());
-        }
-        if(sandwich.getDescription().isEmpty()){
-            tv_description.setText(R.string.detail_description_label);
-        } else {
-            tv_description.setText(R.string.detail_error_message);
-        }
-        if(sandwich.getIngredients().isEmpty()){
-            tv_ingredients.setText(R.string.detail_error_message);
-        } else {
-            tv_ingredients.setText(R.string.detail_error_message);
+        origin.setText(sandwich.getPlaceOfOrigin());
+
+        ingredients.setText("");
+        for (int i = 0; i < sandwich.getIngredients().size(); i++) {
+            ingredients.append("* " + sandwich.getIngredients().get(i));
+            ingredients.append("\n");
         }
 
-
+        description.setText(sandwich.getDescription());
+        description.append("\n");
     }
+
+
 }
