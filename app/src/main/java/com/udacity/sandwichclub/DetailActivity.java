@@ -84,6 +84,8 @@ public class DetailActivity extends AppCompatActivity {
 
         name.setText(sandwich.getMainName());
 
+        //I have learnt how to make this part of code thanks to https://github.com/keponer?tab=repositories
+
         alsoKnown.setText("");
         for (int i = 0; i < sandwich.getAlsoKnownAs().size(); i++) {
             alsoKnown.append("* " + sandwich.getAlsoKnownAs().get(i));
